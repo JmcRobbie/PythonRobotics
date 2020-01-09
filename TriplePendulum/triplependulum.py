@@ -70,18 +70,43 @@ def integrateState(ddx, dt, x):
     return x
 
 def plotDynamics(x):
-    points = cart_positions(x)
-    for i in range(4):
-        if i is not 3:
-            plt.plot([points[i][0], points[i + 1][0]],
-                    [points[i][1], points[i + 1][1]], 'r-')
-        plt.plot(points[i][0], points[i][1], 'ko')
+    cart_w = 1.0
+    cart_h = 0.5
+    radius = 0.1
 
+    cx = np.matrix([-cart_w / 2.0, cart_w / 2.0, cart_w /
+                    2.0, -cart_w / 2.0, -cart_w / 2.0])
+    cy = np.matrix([0.0, 0.0, cart_h, cart_h, 0.0])
+    cy += radius * 2.0
 
-    plt.xlim([-3, 3])
-    plt.ylim([-3, 3])
-    plt.draw()
-    plt.pause(0.0001)  
+    cx = cx + xt
+
+    bx = np.matrix([0.0, l_bar * math.sin(-theta)])
+    bx += xt
+    by = np.matrix([cart_h, l_bar * math.cos(-theta) + cart_h])
+    by += radius * 2.0
+
+    angles = np.arange(0.0, math.pi * 2.0, math.radians(3.0))
+    ox = [radius * math.cos(a) for a in angles]
+    oy = [radius * math.sin(a) for a in angles]
+
+    rwx = np.copy(ox) + cart_w / 4.0 + xt
+    rwy = np.copy(oy) + radius
+    lwx = np.copy(ox) - cart_w / 4.0 + xt
+    lwy = np.copy(oy) + radius
+
+    wx = np.copy(ox) + float(bx[0, -1])
+    wy = np.copy(oy) + float(by[0, -1])
+
+    plt.plot(flatten(cx), flatten(cy), "-b")
+    plt.plot(flatten(bx), flatten(by), "-k")
+    plt.plot(flatten(rwx), flatten(rwy), "-k")
+    plt.plot(flatten(lwx), flatten(lwy), "-k")
+    plt.plot(flatten(wx), flatten(wy), "-k")
+    plt.title("x:" + str(round(xt, 2)) + ",theta:" +
+              str(round(math.degrees(theta), 2)))
+
+    plt.axis("equal")
 
 def cart_positions(x):
     '''
